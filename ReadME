@@ -1,0 +1,83 @@
+Status anzeigen
+Für deinen mbusd Dienst:
+systemctl status mbusd
+Falls du mehrere hast (z. B. USB Varianten):
+systemctl status mbusd-ttyUSB1
+
+oder bei Template:
+
+systemctl status mbusd@ttyUSB0
+🔍 Live Logs (sehr hilfreich)
+journalctl -u mbusd -f
+
+oder:
+
+journalctl -u mbusd-ttyUSB1 -f
+🧠 Kurz erklärt
+Befehl	Zweck
+status	aktueller Zustand
+-f	Live-Ausgabe (wie Debug)
+journalctl	komplette Logs
+👍 Tipp
+
+Wenn etwas nicht startet, immer zuerst:
+
+systemctl status mbusd
+
+Dann direkt:
+
+journalctl -u mbusd -n 50
+
+Wenn du willst, kannst du mir die Status-Ausgabe schicken – dann sag ich dir sofort, ob alles sauber läuft 👍
+
+####################################################################################################################################
+Einen neuen systemd-Service legst du so an (auf deinem Raspberry/Debian mit systemd 👍):
+
+🧾 1. Service-Datei erstellen
+sudo nano /etc/systemd/system/mein-service.service
+
+👉 Der Name mein-service.service ist frei wählbar.
+
+✍️ 2. Beispiel-Inhalt
+
+Ein einfaches Beispiel (für ein Programm wie mbusd):
+
+[Unit]
+Description=Mein Test Service
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/programm
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
+🔄 3. systemd neu laden
+sudo systemctl daemon-reload
+▶️ 4. Service starten
+sudo systemctl start mein-service
+🔥 5. beim Boot automatisch starten
+sudo systemctl enable mein-service
+📊 6. Status prüfen
+systemctl status mein-service
+📜 7. Logs anschauen
+journalctl -u mein-service -f
+🧠 Wichtiges Verständnis
+.service Datei = nur Beschreibung für systemd
+ExecStart = was wirklich gestartet wird
+systemd startet kein Programm automatisch ohne Service-Datei
+⚡ Beispiel für dein mbusd (konkret)
+[Unit]
+Description=mbusd Modbus Gateway
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/mbusd -c /etc/mbusd/mbusd.conf -d
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+🔍 Schritt 5: prüfen
+systemctl status mbusd
+journalctl -u mbusd -f
